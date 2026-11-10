@@ -1,6 +1,10 @@
 // What the buttons know about the session's folder; null when it is not a git repo.
 export type GitInfo = {
-  isDirty: boolean
+  // changed, staged and untracked files
+  changes: number
+  // lines added and removed across those files, new files included
+  added: number
+  removed: number
   hasRemote: boolean
   // commits not on the upstream; null when the branch has no upstream yet
   ahead: number | null
@@ -8,6 +12,6 @@ export type GitInfo = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'quick-actions': { git: Shaped<GitInfo | null> }
+    'john-claude-mods': { git: Shaped<GitInfo | null> }
   }
 }

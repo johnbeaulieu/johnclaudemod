@@ -1,10 +1,10 @@
-# quick-actions
+# john-claude-mods
 
 A Claude Code mod that puts git buttons above the prompt box, so common actions are one click away.
 
 | Repository state | Commit | Second button |
 |---|---|---|
-| Uncommitted changes | enabled | **Commit & push**, enabled |
+| Uncommitted changes | **Commit (n)**, enabled, followed by **+a -r**: n changed files, a lines added (green), r removed (red), new files included | **Commit & push**, enabled |
 | Nothing to commit, local commits not pushed (or branch never pushed) | dimmed | **Push**, enabled |
 | Nothing to commit, remote up to date | dimmed | **Push**, dimmed |
 | No remote set up | as above | hidden |
@@ -17,7 +17,7 @@ Each button sends a request to Claude (for example "Commit the current changes w
 At the prompt of a Claude Code terminal session:
 
 ```
-/plugin install quick-actions --marketplace johnbeaulieu/johnclaudemod
+/plugin install john-claude-mods --marketplace johnbeaulieu/johnclaudemod
 ```
 
 Answer `y` to add the marketplace, then pick a scope (user scope loads it in every session).
@@ -25,7 +25,7 @@ Answer `y` to add the marketplace, then pick a scope (user scope loads it in eve
 From a shell:
 
 ```bash
-claude plugin install quick-actions --marketplace johnbeaulieu/johnclaudemod
+claude plugin install john-claude-mods --marketplace johnbeaulieu/johnclaudemod
 ```
 
 In the Claude desktop app, where `/plugin` does not run: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `johnbeaulieu/johnclaudemod`, then **Add plugin**.

@@ -1,5 +1,5 @@
 {
   "name": "johnclaudemod",
   "owner": { "name": "John Beaulieu" },
-  "plugins": [{ "name": "quick-actions", "source": "./" }]
+  "plugins": [{ "name": "john-claude-mods", "source": "./" }]
 }
