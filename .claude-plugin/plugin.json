@@ -1,0 +1,9 @@
+{
+  "name": "quick-actions",
+  "version": "0.2.0",
+  "description": "Buttons above the prompt for common actions like commit and commit & push",
+  "author": { "name": "John Beaulieu" },
+  "license": "MIT",
+  "repository": "https://github.com/johnbeaulieu/johnclaudemod",
+  "types": "./types/index.d.ts"
+}
