@@ -102,45 +102,37 @@ export const register: Register = on => {
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
     const info = await read($, git)
-    if (e.props.hasSurvey || !info) {
+    const isDirty = !!info && info.changes > 0
+    // No upstream yet means the branch has never been pushed.
+    const canPush = !!info?.hasRemote && (isDirty || info.ahead !== 0)
+
+    // Only actions that would do something are shown; none, no band.
+    if (e.props.hasSurvey || !info || (!isDirty && !canPush)) {
       return next(e)
     }
 
     const { Box, Button, Text } = $.ui.resolve(e)
-    const isDirty = info.changes > 0
-    // No upstream yet means the branch has never been pushed.
-    const needsPush = isDirty || info.ahead !== 0
 
     return (
       <Box flexGrow={1} justifyContent="flex-end" columnGap={2}>
-        <Box columnGap={1}>
-          <Button
-            key="commit"
-            label={isDirty ? `Commit (${info.changes})` : 'Commit'}
-            dimColor={!isDirty}
-            onPress={() =>
-              isDirty
-                ? void $.prompt.submit({ text: COMMIT })
-                : $.ui.toast('Nothing to commit')
-            }
-          />
-          {/* outside the Button: a desktop's native button drops child colors */}
-          {isDirty && (
-            <Box key="lines" columnGap={1}>
-              <Text color={GREEN}>{`+${info.added}`}</Text>
-              <Text color={RED}>{`-${info.removed}`}</Text>
-            </Box>
-          )}
-        </Box>
-        {info.hasRemote && (
+        {isDirty && (
+          <Box key="commit-row" columnGap={1}>
+            <Button
+              key="commit"
+              label={`Commit (${info.changes})`}
+              onPress={() => void $.prompt.submit({ text: COMMIT })}
+            />
+            {/* outside the Button: a desktop's native button drops child colors */}
+            <Text color={GREEN}>{`+${info.added}`}</Text>
+            <Text color={RED}>{`-${info.removed}`}</Text>
+          </Box>
+        )}
+        {canPush && (
           <Button
             key="push"
             label={isDirty ? 'Commit & push' : 'Push'}
-            dimColor={!needsPush}
             onPress={() =>
-              needsPush
-                ? void $.prompt.submit({ text: isDirty ? COMMIT_PUSH : PUSH })
-                : $.ui.toast('Remote is up to date')
+              void $.prompt.submit({ text: isDirty ? COMMIT_PUSH : PUSH })
             }
           />
         )}

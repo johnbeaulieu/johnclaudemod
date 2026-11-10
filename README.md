@@ -2,15 +2,16 @@
 
 A Claude Code mod that puts git buttons above the prompt box, so common actions are one click away.
 
-| Repository state | Commit | Second button |
-|---|---|---|
-| Uncommitted changes | **Commit (n)**, enabled, followed by **+a -r**: n changed files, a lines added (green), r removed (red), new files included | **Commit & push**, enabled |
-| Nothing to commit, local commits not pushed (or branch never pushed) | dimmed | **Push**, enabled |
-| Nothing to commit, remote up to date | dimmed | **Push**, dimmed |
-| No remote set up | as above | hidden |
-| Not a git repository | hidden | hidden |
+A button appears only when it has something to do:
 
-Each button sends a request to Claude (for example "Commit the current changes with a clear message"), so Claude writes the commit message and handles any errors. Clicking a dimmed button shows a short notice and does nothing else. The mod re-checks git every 3 seconds and after each turn, so changes made in your own terminal show up quickly. "Remote up to date" compares against your last fetch; the mod does not fetch for you.
+| Repository state | Buttons shown |
+|---|---|
+| Uncommitted changes | **Commit (n) +a -r** (n changed files; a lines added in green, r removed in red, new files included), plus **Commit & push** if there's a remote |
+| Nothing to commit, local commits not pushed (or branch never pushed) | **Push** |
+| Nothing to commit, remote up to date | none |
+| Not a git repository | none |
+
+Each button sends a request to Claude (for example "Commit the current changes with a clear message"), so Claude writes the commit message and handles any errors. The mod re-checks git every 3 seconds and after each turn, so changes made in your own terminal show up quickly. "Remote up to date" compares against your last fetch; the mod does not fetch for you.
 
 ## Install
 
