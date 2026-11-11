@@ -20,6 +20,10 @@ const MAX_UNTRACKED = 50
 const git = atom({ plugin: 'john-claude-mods', key: 'git' } as const, null, {
   shape: 'git-3',
 })
+// mirrors $.store's 'hidden' so a toggle redraws the band; the store keeps it across sessions
+const hidden = atom({ plugin: 'john-claude-mods', key: 'hidden' } as const, false)
+
+const COMMAND = 'johnclaudemod'
 
 // Reads `git status --porcelain=v2 --branch -uall` output.
 export function parseStatus(out: string) {
@@ -88,6 +92,17 @@ async function refresh($: EngineInterface) {
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    // refused if another copy of this mod already took the name; the buttons still work
+    await $.command
+      .register({
+        name: COMMAND,
+        description: 'Hide or show the git buttons above the prompt',
+        argumentHint: 'hide | show',
+        immediate: true,
+      })
+      .catch(() => undefined)
+    const stored = (await $.store.get('hidden')) === true
+    await update($, hidden, () => stored)
     await refresh($)
     // ponytail: polls every 3s to catch changes made outside Claude; a file watcher if that ever costs too much
     $.clock.every(3000, () => refresh($))
@@ -100,7 +115,19 @@ export const register: Register = on => {
     return done
   })
 
+  on('command.run', { command: COMMAND }, async ($, e) => {
+    const arg = e.args.trim().toLowerCase()
+    if (arg !== 'hide' && arg !== 'show') {
+      return { text: `Usage: /${COMMAND} hide | show` }
+    }
+    const isHidden = arg === 'hide'
+    await $.store.set('hidden', isHidden)
+    await update($, hidden, () => isHidden)
+    return { text: isHidden ? 'Git buttons hidden.' : 'Git buttons shown.' }
+  })
+
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
+    if (await read($, hidden)) return next(e)
     const info = await read($, git)
     const isDirty = !!info && info.changes > 0
     // No upstream yet means the branch has never been pushed.

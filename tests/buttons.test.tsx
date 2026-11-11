@@ -114,6 +114,8 @@ for (const c of CASES) {
       return text === undefined ? { deny: 'missing' } : { value: text }
     })
     on('clock.every', () => ({ value: undefined }))
+    on('command.register', () => ({ value: { command: 'johnclaudemod' } }))
+    on('store.get', () => ({ value: undefined }))
     on('session.start', (_, e) => ({ cwd: e.cwd }))
     on('turn.complete', () => ({ text: '' }))
     on('ui.render', ($, e) => {
@@ -149,3 +151,43 @@ for (const c of CASES) {
     await ui.unmount()
   })
 }
+
+test('/johnclaudemod hide and show toggle the band, and hide is remembered', async ($, on) => {
+  const store = new Map<string, unknown>()
+  on('session.cwd', () => ({ value: '/repo' }))
+  on('process.run', (_, e) => ({
+    value: {
+      exitCode: 0,
+      stdout: e.argv[1] === 'status' ? '# branch.oid abc\n# branch.head main\n# branch.ab +2 -0\n' : e.argv[1] === 'remote' ? 'origin\n' : '',
+      stderr: '',
+      isStdoutTruncated: false,
+      isStderrTruncated: false,
+    },
+  }))
+  on('clock.every', () => ({ value: undefined }))
+  on('command.register', () => ({ value: { command: 'johnclaudemod' } }))
+  on('store.get', (_, e) => ({ value: store.get(e.key) }))
+  on('store.set', (_, e) => {
+    store.set(e.key, e.value)
+    return { value: undefined }
+  })
+  on('session.start', (_, e) => ({ cwd: e.cwd }))
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+    return <Text>engine</Text>
+  })
+  await $.session.start({ cwd: '/repo', surface: 'desktop', isInteractive: true })
+
+  const ui = await $.ui.mount(BAND)
+  expect((await ui.find({ type: 'Button', key: 'push' }))?.text).toBe('Push')
+
+  expect((await $.command.run({ command: 'johnclaudemod', args: 'hide' } as never)).text).toBe('Git buttons hidden.')
+  expect(await ui.find({ type: 'Button', key: 'push' })).toBe(undefined)
+  expect(store.get('hidden')).toBe(true)
+
+  expect((await $.command.run({ command: 'johnclaudemod', args: 'bogus' } as never)).text).toBe('Usage: /johnclaudemod hide | show')
+
+  expect((await $.command.run({ command: 'johnclaudemod', args: 'show' } as never)).text).toBe('Git buttons shown.')
+  expect((await ui.find({ type: 'Button', key: 'push' }))?.text).toBe('Push')
+  await ui.unmount()
+})

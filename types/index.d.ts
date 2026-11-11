@@ -12,6 +12,10 @@ export type GitInfo = {
 
 declare module 'claude-code' {
   interface PluginState {
-    'john-claude-mods': { git: Shaped<GitInfo | null> }
+    'john-claude-mods': {
+      git: Shaped<GitInfo | null>
+      // set by `/johnclaudemod hide`, cleared by `/johnclaudemod show`
+      hidden: boolean
+    }
   }
 }
