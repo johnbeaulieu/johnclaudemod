@@ -13,7 +13,7 @@ A button appears only when it has something to do:
 
 Each button sends a request to Claude (for example "Commit the current changes with a clear message"), so Claude writes the commit message and handles any errors. The mod re-checks git every 3 seconds and after each turn, so changes made in your own terminal show up quickly. "Remote up to date" compares against your last fetch; the mod does not fetch for you.
 
-Type `/johnclaudemod hide` to hide the buttons and `/johnclaudemod show` to bring them back. The choice is remembered across sessions.
+Type `/johnclaudemod hide` to hide the buttons and `/johnclaudemod show` to bring them back. The choice is remembered across sessions. `/johnclaudemod version` shows which version is loaded and where it was loaded from.
 
 ## Install
 

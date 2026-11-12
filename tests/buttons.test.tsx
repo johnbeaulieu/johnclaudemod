@@ -174,6 +174,9 @@ test('/johnclaudemod hide and show toggle the band, and hide is remembered', asy
     store.set(e.key, e.value)
     return { value: undefined }
   })
+  on('fs.read', (_, e) =>
+    /plugin\.json$/.test(e.path) ? { value: '{ "name": "john-claude-mods", "version": "9.8.7" }' } : { deny: 'missing' },
+  )
   on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('ui.render', ($, e) => {
     const { Text } = $.ui.resolve(e)
@@ -188,9 +191,12 @@ test('/johnclaudemod hide and show toggle the band, and hide is remembered', asy
   expect(await ui.find({ type: 'Button', key: 'push' })).toBe(undefined)
   expect(store.get('hidden')).toBe(true)
 
-  expect((await $.command.run({ command: 'johnclaudemod', args: 'bogus' } as never)).text).toBe('Usage: /johnclaudemod hide | show')
+  expect((await $.command.run({ command: 'johnclaudemod', args: 'bogus' } as never)).text).toBe('Usage: /johnclaudemod hide | show | version')
 
   expect((await $.command.run({ command: 'johnclaudemod', args: 'show' } as never)).text).toBe('Git buttons shown.')
+  expect((await $.command.run({ command: 'johnclaudemod', args: 'version' } as never)).text).toMatch(
+    /^john-claude-mods 9\.8\.7, loaded from /,
+  )
   expect((await ui.find({ type: 'Button', key: 'push' }))?.text).toBe('Push')
   await ui.unmount()
 })

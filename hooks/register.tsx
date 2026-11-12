@@ -96,8 +96,8 @@ export const register: Register = on => {
     await $.command
       .register({
         name: COMMAND,
-        description: 'Hide or show the git buttons above the prompt',
-        argumentHint: 'hide | show',
+        description: "Hide or show the git buttons above the prompt, or show the mod's version",
+        argumentHint: 'hide | show | version',
         immediate: true,
       })
       .catch(() => undefined)
@@ -117,8 +117,14 @@ export const register: Register = on => {
 
   on('command.run', { command: COMMAND }, async ($, e) => {
     const arg = e.args.trim().toLowerCase()
+    if (arg === 'version') {
+      // read from the loaded copy's manifest, so it can't drift from plugin.json
+      const manifest = await $.fs.read(`${$.plugin.root}/.claude-plugin/plugin.json`)
+      const { name, version } = JSON.parse(manifest) as { name: string; version?: string }
+      return { text: `${name} ${version ?? '(no version)'}, loaded from ${$.plugin.root}` }
+    }
     if (arg !== 'hide' && arg !== 'show') {
-      return { text: `Usage: /${COMMAND} hide | show` }
+      return { text: `Usage: /${COMMAND} hide | show | version` }
     }
     const isHidden = arg === 'hide'
     await $.store.set('hidden', isHidden)
