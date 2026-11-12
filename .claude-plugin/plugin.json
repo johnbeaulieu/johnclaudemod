@@ -1,6 +1,6 @@
 {
   "name": "john-claude-mods",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Buttons above the prompt for common actions like commit and commit & push",
   "author": { "name": "John Beaulieu" },
   "license": "MIT",

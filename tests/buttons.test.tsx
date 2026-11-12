@@ -139,6 +139,9 @@ for (const c of CASES) {
     expect(commit ? { text: commit.text, dim: !!commit.props.dimColor } : null).toEqual(c.commit)
     expect(push ? { text: push.text, dim: !!push.props.dimColor } : null).toEqual(c.push)
 
+    // whatever is beneath (here the engine's stand-in) is kept, with or without buttons
+    expect((await ui.find({ type: 'Text', text: 'engine' }))?.text).toBe('engine')
+
     // line counts sit beside the button: "+a" green, "-r" red
     const lines = 'lines' in c ? c.lines : undefined
     const added = await ui.find({ type: 'Text', text: /^\+\d+$/ })

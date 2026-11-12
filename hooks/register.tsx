@@ -139,30 +139,35 @@ export const register: Register = on => {
     }
 
     const { Box, Button, Text } = $.ui.resolve(e)
+    // keep what other mods (or the engine) draw here; the buttons go under it
+    const below = await next(e)
 
     return (
-      <Box flexGrow={1} justifyContent="flex-end" columnGap={2}>
-        {isDirty && (
-          <Box key="commit-row" columnGap={1}>
+      <Box flexDirection="column">
+        {below}
+        <Box flexGrow={1} justifyContent="flex-end" columnGap={2}>
+          {isDirty && (
+            <Box key="commit-row" columnGap={1}>
+              <Button
+                key="commit"
+                label={`Commit (${info.changes})`}
+                onPress={() => void $.prompt.submit({ text: COMMIT })}
+              />
+              {/* outside the Button: a desktop's native button drops child colors */}
+              <Text color={GREEN}>{`+${info.added}`}</Text>
+              <Text color={RED}>{`-${info.removed}`}</Text>
+            </Box>
+          )}
+          {canPush && (
             <Button
-              key="commit"
-              label={`Commit (${info.changes})`}
-              onPress={() => void $.prompt.submit({ text: COMMIT })}
+              key="push"
+              label={isDirty ? 'Commit & push' : 'Push'}
+              onPress={() =>
+                void $.prompt.submit({ text: isDirty ? COMMIT_PUSH : PUSH })
+              }
             />
-            {/* outside the Button: a desktop's native button drops child colors */}
-            <Text color={GREEN}>{`+${info.added}`}</Text>
-            <Text color={RED}>{`-${info.removed}`}</Text>
-          </Box>
-        )}
-        {canPush && (
-          <Button
-            key="push"
-            label={isDirty ? 'Commit & push' : 'Push'}
-            onPress={() =>
-              void $.prompt.submit({ text: isDirty ? COMMIT_PUSH : PUSH })
-            }
-          />
-        )}
+          )}
+        </Box>
       </Box>
     )
   })
